@@ -13,4 +13,9 @@ API.interceptors.request.use((req) => {
   return req;
 });
 
+export const getMemberById = async (id) => {
+  const { data } = await API.get(`/members/details/${id}`);
+  return data;
+};
+
 export default API;

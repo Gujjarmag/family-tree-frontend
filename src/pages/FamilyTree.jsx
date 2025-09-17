@@ -9,11 +9,17 @@ import { useTree } from "../context/TreeContext";
 import { useTreeName } from "../hooks/useTreeName";
 import { useMembers } from "../hooks/useMembers";
 import { useTreeData } from "../hooks/useTreeData";
+import MemberDetailsModal from "../components/MemberDetailsModal";
+
 // import { useState } from "react";
 
 Modal.setAppElement("#root"); // accessibility
 
 export default function FamilyTree() {
+  // new const added
+  const [isDetailsOpen, setIsDetailsOpen] = useState(false);
+  const [detailsMember, setDetailsMember] = useState(null);
+
   const { treeId } = useParams();
   const navigate = useNavigate();
   const [formError, setFormError] = useState("");
@@ -220,21 +226,13 @@ export default function FamilyTree() {
       >
         <div
           xmlns="http://www.w3.org/1999/xhtml"
-          // style={{
-          //   backgroundColor: "#ffffff",
-          //   border: "1px solid #babdc4ff",
-          //   borderRadius: "12px",
-          //   padding: "10px",
-          //   boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.2)",
-          //   textAlign: "center",
-          //   position: "relative",
-          //   fontFamily: "sans-serif",
-          //   fontSize: "14px",
-          //   // New styles
-          //   alignItems: "center",
-          //   display: "flex",
-          // }}
           className="bg-white border border-gray-300 rounded-xl p-2 shadow-md text-center relative font-sans text-sm flex items-center"
+          onClick={() => {
+            if (!isEditingMode) {
+              setDetailsMember(nodeDatum.id); // ⬅️ pass ID only
+              setIsDetailsOpen(true);
+            }
+          }}
         >
           {/* === Profile Photo or Placeholder === */}
           <div style={{ marginBottom: "6px" }}>
@@ -254,11 +252,7 @@ export default function FamilyTree() {
             <div className="font-semibold text-base text-gray-800">
               {nodeDatum.name}
             </div>
-            {/* {nodeDatum.gender && (
-              <div style={{ fontSize: "12px", color: "#6B7280" }}>
-                Gender: {nodeDatum.gender}
-              </div>
-            )} */}
+
             {prettyDob && (
               <div className="text-xs text-gray-500">{prettyDob}</div>
             )}
@@ -353,7 +347,6 @@ export default function FamilyTree() {
                 type="checkbox"
                 checked={isEditingMode}
                 onChange={(e) => setIsEditingMode(e.target.checked)}
-                // style={{ marginRight: "6px" }}
                 className="mr-2 accent-blue-600"
               />
               Editing Mode
@@ -418,6 +411,13 @@ export default function FamilyTree() {
         }}
         selectedNode={selectedNode}
       />
+      {isDetailsOpen && (
+        <MemberDetailsModal
+          memberId={detailsMember} // pass ID only
+          isOpen={isDetailsOpen}
+          onClose={() => setIsDetailsOpen(false)}
+        />
+      )}
     </div>
   );
 }

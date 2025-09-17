@@ -13,9 +13,9 @@ export default function AddMemberModal({
       isOpen={isOpen}
       onRequestClose={onRequestClose}
       contentLabel="Add Member"
-      className="w-[400px] px-3 py-2 border rounded focus:outline-none focus:ring focus:border-blue-300"
+      className="rounded-lg p-6 bg-white shadow-xl w-full max-w-md mx-auto"
     >
-      <h2 style={{ marginBottom: "15px", textAlign: "center" }}>
+      <h2 className="mb-4 text-xl font-bold text-center">
         Add {relationType.charAt(0).toUpperCase() + relationType.slice(1)}
       </h2>
       <form onSubmit={handleAddMember}>
@@ -62,6 +62,7 @@ export default function AddMemberModal({
             }
           />
         </div>
+
         <button
           type="submit"
           className="w-full py-2 bg-blue-600 text-white rounded font-bold hover:bg-blue-700 transition"
