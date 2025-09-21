@@ -168,6 +168,16 @@ export default function FamilyTree() {
     }
   };
 
+  // inside FamilyTree component (near other handlers)
+  const refreshMembers = async () => {
+    try {
+      const { data: membersData } = await API.get(`/members/${treeId}`);
+      setMembers(membersData);
+    } catch (err) {
+      console.error("Failed to refresh members:", err);
+    }
+  };
+
   // Call this from the Save Changes button in the Edit modal
   const handleEditSave = async (e) => {
     e.preventDefault();
@@ -416,6 +426,7 @@ export default function FamilyTree() {
           memberId={detailsMember} // pass ID only
           isOpen={isDetailsOpen}
           onClose={() => setIsDetailsOpen(false)}
+          onMemberUpdated={refreshMembers}
         />
       )}
     </div>
