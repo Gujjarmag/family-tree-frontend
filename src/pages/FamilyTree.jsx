@@ -270,12 +270,12 @@ export default function FamilyTree() {
 
           {/* Name */}
           <div className="text-left">
-            <div className="font-semibold text-base text-gray-800">
+            <div className="font-semibold text-sm text-gray-800">
               {nodeDatum.name}
             </div>
 
             {prettyDob && (
-              <div className="text-xs text-gray-500">{prettyDob}</div>
+              <div className="text-xs text-gray-800">{prettyDob}</div>
             )}
           </div>
 
@@ -347,7 +347,7 @@ export default function FamilyTree() {
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
-      <div className="max-w-6xl mx-auto">
+      <div className="w-full">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center space-x-3">
             <Users className="w-6 h-6 text-indigo-600" />
@@ -366,10 +366,10 @@ export default function FamilyTree() {
         {/* Tree */}
         <div
           id="treeWrapper"
-          className="w-full h-[600px] border border-gray-300 bg-gray-300 rounded-lg"
+          className="relative w-full h-[700px] bg-gray-200 rounded-lg"
         >
           {/* Editing Mode Toggle */}
-          <div className="mb-4">
+          <div className="absolute top-4 right-4 z-10">
             <button
               onClick={() => setIsEditingMode(!isEditingMode)}
               className={`flex items-center space-x-2 px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
