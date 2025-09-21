@@ -10,8 +10,12 @@ import { useTreeName } from "../hooks/useTreeName";
 import { useMembers } from "../hooks/useMembers";
 import { useTreeData } from "../hooks/useTreeData";
 import MemberDetailsModal from "../components/MemberDetailsModal";
+import { ArrowLeft, Users, Eye, Edit3, Pencil } from "lucide-react";
 
-// import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+
+// import { useState } from "react"; chjaning now
 
 Modal.setAppElement("#root"); // accessibility
 
@@ -307,7 +311,9 @@ export default function FamilyTree() {
               )}
 
               {/* Edit Button */}
-              <button
+              <Button
+                size="icon"
+                variant="secondary"
                 onClick={(e) => {
                   e.stopPropagation();
                   setSelectedNode(nodeDatum);
@@ -320,11 +326,11 @@ export default function FamilyTree() {
                   });
                   setIsEditModalOpen(true);
                 }}
-                className="absolute top-1 right-1 bg-yellow-500 text-white rounded px-1 py-0.5 text-xs font-bold cursor-pointer border-none shadow"
+                className="absolute top-1 right-1 h-6 w-6 rounded-md bg-blue-400 hover:bg-blue-500 text-white shadow-md transition-all"
                 title="Edit Member"
               >
-                ✎
-              </button>
+                <Pencil className="h-3 w-3" />
+              </Button>
             </>
           )}
         </div>
@@ -336,32 +342,49 @@ export default function FamilyTree() {
     <div className="min-h-screen bg-gray-50 p-6">
       <div className="max-w-6xl mx-auto">
         <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-bold">{treeName}</h1>
+          <div className="flex items-center space-x-3">
+            <Users className="w-6 h-6 text-indigo-600" />
+            <h1 className="text-2xl font-bold text-gray-900">{treeName}</h1>
+          </div>
+
           <button
             onClick={() => navigate("/dashboard")}
-            className="px-3 py-2 rounded bg-gray-800 text-white hover:bg-black transition"
+            className="flex items-center space-x-2 px-4 py-2 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-all duration-200 group"
           >
-            Back to Dashboard
+            <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform duration-200" />
+            <span className="font-medium">Back to Dashboard</span>
           </button>
         </div>
 
         {/* Tree */}
         <div
           id="treeWrapper"
-          style={{ width: "100%", height: "600px", border: "1px solid #ccc" }}
+          className="w-full h-[600px] border border-gray-300 bg-gray-300 rounded-lg"
         >
           {/* Editing Mode Toggle */}
-          <div style={{ marginBottom: "12px" }}>
-            <label style={{ cursor: "pointer", fontWeight: "bold" }}>
-              <input
-                type="checkbox"
-                checked={isEditingMode}
-                onChange={(e) => setIsEditingMode(e.target.checked)}
-                className="mr-2 accent-blue-600"
-              />
-              Editing Mode
-            </label>
+          <div className="mb-4">
+            <button
+              onClick={() => setIsEditingMode(!isEditingMode)}
+              className={`flex items-center space-x-2 px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
+                isEditingMode
+                  ? "bg-blue-600 text-white shadow-lg shadow-blue-200"
+                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+              }`}
+            >
+              {isEditingMode ? (
+                <>
+                  <Edit3 className="w-4 h-4" />
+                  <span>Edit Mode</span>
+                </>
+              ) : (
+                <>
+                  <Eye className="w-4 h-4" />
+                  <span>View Mode</span>
+                </>
+              )}
+            </button>
           </div>
+
           {loading ? (
             <p className="p-4">Loading tree...</p>
           ) : treeData ? (
@@ -379,7 +402,8 @@ export default function FamilyTree() {
           ) : (
             <div className="flex flex-col items-center justify-center h-full">
               <p className="p-4 text-gray-600">
-                No members yet. Start by adding the first member!
+                Begin building your family tree by adding the first family
+                member. This will be the root of your tree.
               </p>
               <button
                 onClick={() => {
