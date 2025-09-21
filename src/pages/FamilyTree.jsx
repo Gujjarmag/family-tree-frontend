@@ -228,7 +228,14 @@ export default function FamilyTree() {
 
   // --- Custom node UI ---
   const renderCustomNode = ({ nodeDatum }) => {
-    const prettyDob = nodeDatum.dob ? String(nodeDatum.dob).slice(0, 10) : null;
+    const prettyDob = nodeDatum.dob
+      ? (() => {
+          const [year, month, day] = String(nodeDatum.dob)
+            .slice(0, 10)
+            .split("-");
+          return `${day}-${month}-${year}`;
+        })()
+      : null;
 
     return (
       <foreignObject

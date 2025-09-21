@@ -45,7 +45,12 @@ export default function MemberDetailsModal({
 
   if (!isOpen) return null;
 
-  const prettyDob = member?.dob ? String(member.dob).slice(0, 10) : "N/A";
+  const prettyDob = member?.dob
+    ? (() => {
+        const [year, month, day] = String(member.dob).slice(0, 10).split("-");
+        return `${day}-${month}-${year}`;
+      })()
+    : "N/A";
 
   // ----- Notes editing handlers -----
   const startEditNotes = () => {
