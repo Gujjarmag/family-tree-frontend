@@ -9,11 +9,21 @@ import { useTree } from "../context/TreeContext";
 import { useTreeName } from "../hooks/useTreeName";
 import { useMembers } from "../hooks/useMembers";
 import { useTreeData } from "../hooks/useTreeData";
-// import { useState } from "react";
+import MemberDetailsModal from "../components/MemberDetailsModal";
+import { ArrowLeft, Users, Eye, Edit3, Pencil } from "lucide-react";
+
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+
+// import { useState } from "react"; chjaning now
 
 Modal.setAppElement("#root"); // accessibility
 
 export default function FamilyTree() {
+  // new const added
+  const [isDetailsOpen, setIsDetailsOpen] = useState(false);
+  const [detailsMember, setDetailsMember] = useState(null);
+
   const { treeId } = useParams();
   const navigate = useNavigate();
   const [formError, setFormError] = useState("");
@@ -162,6 +172,16 @@ export default function FamilyTree() {
     }
   };
 
+  // inside FamilyTree component (near other handlers)
+  const refreshMembers = async () => {
+    try {
+      const { data: membersData } = await API.get(`/members/${treeId}`);
+      setMembers(membersData);
+    } catch (err) {
+      console.error("Failed to refresh members:", err);
+    }
+  };
+
   // Call this from the Save Changes button in the Edit modal
   const handleEditSave = async (e) => {
     e.preventDefault();
@@ -208,7 +228,14 @@ export default function FamilyTree() {
 
   // --- Custom node UI ---
   const renderCustomNode = ({ nodeDatum }) => {
-    const prettyDob = nodeDatum.dob ? String(nodeDatum.dob).slice(0, 10) : null;
+    const prettyDob = nodeDatum.dob
+      ? (() => {
+          const [year, month, day] = String(nodeDatum.dob)
+            .slice(0, 10)
+            .split("-");
+          return `${day}-${month}-${year}`;
+        })()
+      : null;
 
     return (
       <foreignObject
@@ -220,21 +247,13 @@ export default function FamilyTree() {
       >
         <div
           xmlns="http://www.w3.org/1999/xhtml"
-          // style={{
-          //   backgroundColor: "#ffffff",
-          //   border: "1px solid #babdc4ff",
-          //   borderRadius: "12px",
-          //   padding: "10px",
-          //   boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.2)",
-          //   textAlign: "center",
-          //   position: "relative",
-          //   fontFamily: "sans-serif",
-          //   fontSize: "14px",
-          //   // New styles
-          //   alignItems: "center",
-          //   display: "flex",
-          // }}
           className="bg-white border border-gray-300 rounded-xl p-2 shadow-md text-center relative font-sans text-sm flex items-center"
+          onClick={() => {
+            if (!isEditingMode) {
+              setDetailsMember(nodeDatum.id); // ⬅️ pass ID only
+              setIsDetailsOpen(true);
+            }
+          }}
         >
           {/* === Profile Photo or Placeholder === */}
           <div style={{ marginBottom: "6px" }}>
@@ -251,16 +270,12 @@ export default function FamilyTree() {
 
           {/* Name */}
           <div className="text-left">
-            <div className="font-semibold text-base text-gray-800">
+            <div className="font-semibold text-sm text-gray-800">
               {nodeDatum.name}
             </div>
-            {/* {nodeDatum.gender && (
-              <div style={{ fontSize: "12px", color: "#6B7280" }}>
-                Gender: {nodeDatum.gender}
-              </div>
-            )} */}
+
             {prettyDob && (
-              <div className="text-xs text-gray-500">{prettyDob}</div>
+              <div className="text-xs text-gray-800">{prettyDob}</div>
             )}
           </div>
 
@@ -303,7 +318,9 @@ export default function FamilyTree() {
               )}
 
               {/* Edit Button */}
-              <button
+              <Button
+                size="icon"
+                variant="secondary"
                 onClick={(e) => {
                   e.stopPropagation();
                   setSelectedNode(nodeDatum);
@@ -316,11 +333,11 @@ export default function FamilyTree() {
                   });
                   setIsEditModalOpen(true);
                 }}
-                className="absolute top-1 right-1 bg-yellow-500 text-white rounded px-1 py-0.5 text-xs font-bold cursor-pointer border-none shadow"
+                className="absolute top-1 right-1 h-6 w-6 rounded-md bg-blue-400 hover:bg-blue-500 text-white shadow-md transition-all"
                 title="Edit Member"
               >
-                ✎
-              </button>
+                <Pencil className="h-3 w-3" />
+              </Button>
             </>
           )}
         </div>
@@ -330,35 +347,51 @@ export default function FamilyTree() {
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
-      <div className="max-w-6xl mx-auto">
+      <div className="w-full">
         <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-bold">{treeName}</h1>
+          <div className="flex items-center space-x-3">
+            <Users className="w-6 h-6 text-indigo-600" />
+            <h1 className="text-2xl font-bold text-gray-900">{treeName}</h1>
+          </div>
+
           <button
             onClick={() => navigate("/dashboard")}
-            className="px-3 py-2 rounded bg-gray-800 text-white hover:bg-black transition"
+            className="flex items-center space-x-2 px-4 py-2 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-all duration-200 group"
           >
-            Back to Dashboard
+            <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform duration-200" />
+            <span className="font-medium">Back to Dashboard</span>
           </button>
         </div>
 
         {/* Tree */}
         <div
           id="treeWrapper"
-          style={{ width: "100%", height: "600px", border: "1px solid #ccc" }}
+          className="relative w-full h-[700px] bg-gray-200 rounded-lg"
         >
           {/* Editing Mode Toggle */}
-          <div style={{ marginBottom: "12px" }}>
-            <label style={{ cursor: "pointer", fontWeight: "bold" }}>
-              <input
-                type="checkbox"
-                checked={isEditingMode}
-                onChange={(e) => setIsEditingMode(e.target.checked)}
-                // style={{ marginRight: "6px" }}
-                className="mr-2 accent-blue-600"
-              />
-              Editing Mode
-            </label>
+          <div className="absolute top-4 right-4 z-10">
+            <button
+              onClick={() => setIsEditingMode(!isEditingMode)}
+              className={`flex items-center space-x-2 px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
+                isEditingMode
+                  ? "bg-blue-600 text-white shadow-lg shadow-blue-200"
+                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+              }`}
+            >
+              {isEditingMode ? (
+                <>
+                  <Edit3 className="w-4 h-4" />
+                  <span>Edit Mode</span>
+                </>
+              ) : (
+                <>
+                  <Eye className="w-4 h-4" />
+                  <span>View Mode</span>
+                </>
+              )}
+            </button>
           </div>
+
           {loading ? (
             <p className="p-4">Loading tree...</p>
           ) : treeData ? (
@@ -376,7 +409,8 @@ export default function FamilyTree() {
           ) : (
             <div className="flex flex-col items-center justify-center h-full">
               <p className="p-4 text-gray-600">
-                No members yet. Start by adding the first member!
+                Begin building your family tree by adding the first family
+                member. This will be the root of your tree.
               </p>
               <button
                 onClick={() => {
@@ -418,6 +452,14 @@ export default function FamilyTree() {
         }}
         selectedNode={selectedNode}
       />
+      {isDetailsOpen && (
+        <MemberDetailsModal
+          memberId={detailsMember} // pass ID only
+          isOpen={isDetailsOpen}
+          onClose={() => setIsDetailsOpen(false)}
+          onMemberUpdated={refreshMembers}
+        />
+      )}
     </div>
   );
 }
