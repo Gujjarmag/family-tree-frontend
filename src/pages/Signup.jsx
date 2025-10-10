@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle, Mail, Lock, User, Users } from "lucide-react";
-import FamilyTreeBackground from "@/components/FamilyTreeBackground";
+import FamilyTreeBackground from "../components/FamilyTreeBackground";
 
 export default function Signup() {
   const [name, setName] = useState("");
